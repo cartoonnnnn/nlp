@@ -1,68 +1,33 @@
-import numpy as np
-from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Embedding, LSTM, Dense
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.utils import to_categorical
+sudo apt update
+sudo apt install redis-server -y
+sudo service redis-server start
+redis-cli
 
-# Sample text data
-text = (
-    "I love natural language processing\n"
-    "deep learning is powerful\n"
-    "language models generate text\n"
-    "machine learning is amazing"
-)
+SET product:1 '{"Name":"Laptop","Category":"Electronics","Price":900}'
+SET product:2 '{"Name":"Phone","Category":"Electronics","Price":700}'
+SET product:3 '{"Name":"Shoes","Category":"Fashion","Price":800}'
+SET product:4 '{"Name":"Watch","Category":"Accessories","Price":600}'
+SET product:5 '{"Name":"Headphones","Category":"Electronics","Price":500}'
 
-# Tokenization
-tok = Tokenizer()
-tok.fit_on_texts([text])
+SADD category:Electronics product:1 product:2 product:5
+SADD category:Fashion product:3
+SADD category:Accessories product:4
 
-v_size = len(tok.word_index) + 1
+ZADD price_index 900 product:1
+ZADD price_index 700 product:2
+ZADD price_index 800 product:3
+ZADD price_index 600 product:4
+ZADD price_index 500 product:5
 
-# Create sequences
-sequences = []
+GET product:1
 
-for line in text.split('\n'):
-    token_list = tok.texts_to_sequences([line])[0]
-    for i in range(1, len(token_list)):
-        n_gram_seq = token_list[:i + 1]
-        sequences.append(n_gram_seq)
+SMEMBERS category:Electronics
 
-# Pad sequences
-seq = pad_sequences(sequences, padding='pre')
+ZRANGEBYSCORE price_index 500 1000
 
-# Split predictors and labels
-X = seq[:, :-1]
-y = to_categorical(seq[:, -1], num_classes=v_size)
+SET product:1 '{"Name":"Laptop","Category":"Electronics","Price":950}'
+ZADD price_index 950 product:1
 
-# Build model
-model = Sequential([
-    Embedding(v_size, 32, input_length=X.shape[1]),
-    LSTM(64),
-    Dense(v_size, activation='softmax')
-])
-
-model.compile(
-    loss='categorical_crossentropy',
-    optimizer='adam'
-)
-
-# Train model
-model.fit(X, y, epochs=200, verbose=1)
-
-# Generate text
-out = "language models"
-
-for _ in range(5):
-    p = pad_sequences(
-        tok.texts_to_sequences([out]),
-        maxlen=X.shape[1],
-        padding='pre'
-    )
-
-    pred = model.predict(p, verbose=0)
-    next_word = tok.index_word.get(np.argmax(pred), "")
-
-    out += " " + next_word
-
-print(out)
+DEL product:5
+SREM category:Electronics product:5
+ZREM price_index product:5
