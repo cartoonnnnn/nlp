@@ -1,39 +1,25 @@
-#lab 3
-import math,nltk,pandas as pd
-from collections import Counter
-from nltk.tokenize import word_tokenize
-from sklearn.feature_extraction.text import TfidfVectorizer
+sudo apt update
+sudo apt install couchdb -y
+sudo service couchdb start
+curl -X PUT http://127.0.0.1:5984/librarydb
 
-nltk.download('punkt',quiet=True); nltk.download('punkt_tab',quiet=True)
+curl -X POST http://127.0.0.1:5984/librarydb -H "Content-Type: application/json" -d '{"ISBN":"101","Title":"The Great Gatsby","Author":"F. Scott Fitzgerald","Genre":"Fiction","PublicationYear":1925,"CopiesAvailable":5,"Rating":4.5}'
+curl -X POST http://127.0.0.1:5984/librarydb -H "Content-Type: application/json" -d '{"ISBN":"102","Title":"To Kill a Mockingbird","Author":"Harper Lee","Genre":"Fiction","PublicationYear":1960,"CopiesAvailable":4,"Rating":4.8}'
+curl -X POST http://127.0.0.1:5984/librarydb -H "Content-Type: application/json" -d '{"ISBN":"103","Title":"1984","Author":"George Orwell","Genre":"Dystopian","PublicationYear":1949,"CopiesAvailable":6,"Rating":4.7}'
+curl -X POST http://127.0.0.1:5984/librarydb -H "Content-Type: application/json" -d '{"ISBN":"104","Title":"Moby Dick","Author":"Herman Melville","Genre":"Fiction","PublicationYear":1851,"CopiesAvailable":3,"Rating":4.0}'
+curl -X POST http://127.0.0.1:5984/librarydb -H "Content-Type: application/json" -d '{"ISBN":"105","Title":"The Alchemist","Author":"Paulo Coelho","Genre":"Fiction","PublicationYear":1988,"CopiesAvailable":7,"Rating":4.2}'
+curl -X POST http://127.0.0.1:5984/librarydb -H "Content-Type: application/json" -d '{"ISBN":"106","Title":"Sapiens","Author":"Yuval Noah Harari","Genre":"Non-Fiction","PublicationYear":2011,"CopiesAvailable":5,"Rating":4.6}'
 
-docs=[
-"This movie was fantastic and I loved every minute of it",
-"The acting was terrible and the plot made no sense",
-"Great special effects but the story was predictable",
-"I fell asleep during this boring movie",
-"The soundtrack was amazing and the cinematography stunning"
-]
+curl -X GET http://127.0.0.1:5984/librarydb/_all_docs?include_docs=true
 
-tok=[word_tokenize(d.lower()) for d in docs]
+curl -X POST http://127.0.0.1:5984/librarydb/_find -H "Content-Type: application/json" -d '{"selector":{"Genre":"Fiction"}}'
 
-tf=[{w:c/len(d) for w,c in Counter(d).items()} for d in tok]
-print("Term Frequency (TF):"); [print(f"Document {i+1}: {t}") for i,t in enumerate(tf)]
+curl -X POST http://127.0.0.1:5984/librarydb/_find -H "Content-Type: application/json" -d '{"selector":{},"sort":[{"Title":"asc"}]}'
 
-df={}
-for d in tok:
-    for w in set(d): df[w]=df.get(w,0)+1
+curl -X POST http://127.0.0.1:5984/librarydb/_find -H "Content-Type: application/json" -d '{"selector":{},"sort":[{"Title":"asc"}]}'
 
-idf={w:math.log(len(tok)/df[w]) for w in df}
-print("\nDocument Frequency (DF):",df)
-print("\nInverse Document Frequency (IDF):",idf)
+curl -X POST http://127.0.0.1:5984/librarydb/_find -H "Content-Type: application/json" -d '{"selector":{},"limit":3}'
 
-tfidf=[{w:tf[i][w]*idf[w] for w in tf[i]} for i in range(len(tf))]
-print("\nTF-IDF Scores:"); [print(f"Document {i+1}: {t}") for i,t in enumerate(tfidf)]
+curl -X POST http://127.0.0.1:5984/librarydb/_find -H "Content-Type: application/json" -d '{"selector":{},"skip":3,"limit":3}'
 
-v=TfidfVectorizer(); X=v.fit_transform(docs)
-df2=pd.DataFrame(X.toarray(),columns=v.get_feature_names_out(),
-                 index=[f"Doc {i+1}" for i in range(len(docs))])
-
-for i in df2.index:
-    print(f"\n{i} - Words present with TF-IDF scores:")
-    print(df2.loc[i][df2.loc[i]>0].sort_values(ascending=False))
+curl -X POST http://127.0.0.1:5984/librarydb/_find -H "Content-Type: application/json" -d '{"selector":{"Title":"The Great Gatsby"},"fields":["Author"]}'
