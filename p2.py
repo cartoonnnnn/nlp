@@ -1,36 +1,28 @@
-#lab2
-import nltk
-from nltk import word_tokenize, pos_tag, ne_chunk
-from nltk.chunk import tree2conlltags
+sudo apt update
+sudo apt install couchdb -y
+sudo service couchdb start
+curl -X PUT http://127.0.0.1:5984/studentdb
 
-# downloads
-for d in ['punkt','punkt_tab','maxent_ne_chunker','maxent_ne_chunker_tab',
-          'averaged_perceptron_tagger_eng','words']:
-    nltk.download(d, quiet=True)
+curl -X POST http://127.0.0.1:5984/studentdb -H "Content-Type: application/json" -d '{"SRN":"1","Sname":"Rahul","Degree":"BCA","Sem":5,"CGPA":7.2}'
+curl -X POST http://127.0.0.1:5984/studentdb -H "Content-Type: application/json" -d '{"SRN":"2","Sname":"Anita","Degree":"BCA","Sem":3,"CGPA":6.8}'
+curl -X POST http://127.0.0.1:5984/studentdb -H "Content-Type: application/json" -d '{"SRN":"3","Sname":"Vikram","Degree":"BSc","Sem":2,"CGPA":8.1}'
+curl -X POST http://127.0.0.1:5984/studentdb -H "Content-Type: application/json" -d '{"SRN":"4","Sname":"Priya","Degree":"BCA","Sem":6,"CGPA":7.4}'
+curl -X POST http://127.0.0.1:5984/studentdb -H "Content-Type: application/json" -d '{"SRN":"5","Sname":"Kiran","Degree":"BCom","Sem":4,"CGPA":6.2}'
+curl -X POST http://127.0.0.1:5984/studentdb -H "Content-Type: application/json" -d '{"SRN":"6","Sname":"Sneha","Degree":"BCA","Sem":1,"CGPA":7.0}'
+curl -X POST http://127.0.0.1:5984/studentdb -H "Content-Type: application/json" -d '{"SRN":"7","Sname":"Arjun","Degree":"BCA","Sem":5,"CGPA":6.5}'
 
-text = """Apple Inc. is planning to open a new headquarters
-in Austin, Texas.
-CEO Tim Cook announced the plan along with Harry Potter"""
+curl -X GET http://127.0.0.1:5984/studentdb/_all_docs?include_docs=true
 
-# processing
-bio = tree2conlltags(ne_chunk(pos_tag(word_tokenize(text))))
+curl -X POST http://127.0.0.1:5984/studentdb/_find -H "Content-Type: application/json" -d '{"selector":{"Degree":"BCA"}}'
 
-print(word_tokenize(text))
-print(pos_tag(word_tokenize(text)))
-print(ne_chunk(pos_tag(word_tokenize(text))))
-print(bio)
+curl -X POST http://127.0.0.1:5984/studentdb/_find -H "Content-Type: application/json" -d '{"selector":{},"sort":[{"Sname":"asc"}]}'
 
-# entity extraction (minimum possible logic)
-e, c, t = [], [], None
-for w, _, tag in bio:
-    if tag.startswith('B-'):
-        if c: e.append((' '.join(c), t))
-        c, t = [w], tag[2:]
-    elif tag.startswith('I-') and t == tag[2:]:
-        c.append(w)
-    else:
-        if c: e.append((' '.join(c), t)); c, t = [], None
+curl -X POST http://127.0.0.1:5984/studentdb/_find -H "Content-Type: application/json" -d '{"selector":{},"limit":5}'
 
-if c: e.append((' '.join(c), t))
+curl -X POST http://127.0.0.1:5984/studentdb/_find -H "Content-Type: application/json" -d '{"selector":{},"skip":4,"limit":3}'
 
-print(e)
+curl -X POST http://127.0.0.1:5984/studentdb/_find -H "Content-Type: application/json" -d '{"selector":{"Sname":"Rahul"},"fields":["Degree"]}'
+
+curl -X POST http://127.0.0.1:5984/studentdb/_find -H "Content-Type: application/json" -d '{"selector":{},"sort":[{"CGPA":"desc"}],"skip":4,"limit":3}'
+
+curl -X POST http://127.0.0.1:5984/studentdb/_find -H "Content-Type: application/json" -d '{"selector":{"Degree":"BCA","CGPA":{"$gt":6,"$lt":7.5}}}'
