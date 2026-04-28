@@ -1,6 +1,7 @@
 sudo apt update
 sudo apt install couchdb -y
 sudo service couchdb start
+curl -X PUT http://admin:admin123@127.0.0.1:5984/librarydb
 
 curl -X POST http://admin:admin123@127.0.0.1:5984/librarydb \
 -H "Content-Type: application/json" \
