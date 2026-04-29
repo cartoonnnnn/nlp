@@ -5,9 +5,9 @@ docker --version
 
 sudo docker run -d -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=admin123 --name couchdb-container couchdb
 
-curl -X PUT http://admin:admin123@127.0.0.1:5984/studentdb
+curl -X PUT http://admin:admin123@localhost:5984/studentdb
 
-curl -X POST http://admin:admin123@127.0.0.1:5984/studentdb/_bulk_docs \
+curl -X POST http://admin:admin123@localhost:5984/studentdb/_bulk_docs \
 -H "Content-Type: application/json" \
 -d '{
   "docs": [
@@ -21,40 +21,32 @@ curl -X POST http://admin:admin123@127.0.0.1:5984/studentdb/_bulk_docs \
   ]
 }'
 
-curl -X POST http://admin:admin123@127.0.0.1:5984/studentdb/_index \
--H "Content-Type: application/json" \
--d '{"index":{"fields":["Sname"]},"name":"sname-index","type":"json"}'
+curl -X GET http://admin:admin123@localhost:5984/studentdb/_all_docs?include_docs=true
 
-curl -X POST http://admin:admin123@127.0.0.1:5984/studentdb/_index \
--H "Content-Type: application/json" \
--d '{"index":{"fields":["CGPA"]},"name":"cgpa-index","type":"json"}'
-
-curl -X GET http://admin:admin123@127.0.0.1:5984/studentdb/_all_docs?include_docs=true
-
-curl -X POST http://admin:admin123@127.0.0.1:5984/studentdb/_find \
+curl -X POST http://admin:admin123@localhost:5984/studentdb/_find \
 -H "Content-Type: application/json" \
 -d '{"selector":{"Degree":"BCA"}}'
 
-curl -X POST http://admin:admin123@127.0.0.1:5984/studentdb/_find \
+curl -X POST http://localhost:5984/studentdb/_find \
 -H "Content-Type: application/json" \
 -d '{"selector":{},"sort":[{"Sname":"asc"}]}'
 
-curl -X POST http://admin:admin123@127.0.0.1:5984/studentdb/_find \
+curl -X POST http://admin:admin123@localhost:5984/studentdb/_find \
 -H "Content-Type: application/json" \
 -d '{"selector":{},"limit":5}'
 
-curl -X POST http://admin:admin123@127.0.0.1:5984/studentdb/_find \
+curl -X POST http://admin:admin123@localhost:5984/studentdb/_find \
 -H "Content-Type: application/json" \
 -d '{"selector":{"SRN":{"$in":[5,6,7]}}}'
 
-curl -X POST http://admin:admin123@127.0.0.1:5984/studentdb/_find \
+curl -X POST http://admin:admin123@localhost:5984/studentdb/_find \
 -H "Content-Type: application/json" \
 -d '{"selector":{"Sname":"Rahul"},"fields":["Degree"]}'
 
-curl -X POST http://admin:admin123@127.0.0.1:5984/studentdb/_find \
+curl -X POST http://admin:admin123@localhost:5984/studentdb/_find \
 -H "Content-Type: application/json" \
 -d '{"selector":{"SRN":{"$in":[5,6,7]}},"sort":[{"CGPA":"desc"}]}'
 
-curl -X POST http://admin:admin123@127.0.0.1:5984/studentdb/_find \
+curl -X POST http://admin:admin123@localhost:5984/studentdb/_find \
 -H "Content-Type: application/json" \
 -d '{"selector":{"Degree":"BCA","CGPA":{"$gt":6,"$lt":7.5}}}'
