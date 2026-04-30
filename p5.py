@@ -1,4 +1,6 @@
-docker start neo4j-container || docker run -d -p 7474:7474 -p 7687:7687 --name neo4j-container -e NEO4J_AUTH=neo4j/password neo4j && sleep 10 && docker exec -i neo4j-container cypher-shell -u neo4j -p password <<'EOF'
+docker start neo4j-container
+docker ps
+
 CREATE (:User {UserID:1, Username:'John'}),
        (:User {UserID:2, Username:'Alice'}),
        (:User {UserID:3, Username:'Bob'}),
