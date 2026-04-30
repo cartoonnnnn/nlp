@@ -9,9 +9,15 @@ SET employee:3 '{"Name":"Kiran","Department":"HR","Position":"Executive","Salary
 SET employee:4 '{"Name":"Sneha","Department":"IT","Position":"Developer","Salary":70000}'
 SET employee:5 '{"Name":"Arjun","Department":"HR","Position":"Assistant","Salary":52000}'
 
-SADD dept:HR employee:1 employee:3 employee:5 SADD dept:Finance employee:2 SADD dept:IT employee:4
+SADD dept:HR employee:1 employee:3 employee:5
+SADD dept:Finance employee:2
+SADD dept:IT employee:4
 
-ZADD salary_index 60000 employee:1 ZADD salary_index 55000 employee:2 ZADD salary_index 48000 employee:3 ZADD salary_index 70000 employee:4 ZADD salary_index 52000 employee:5
+ZADD salary_index 60000 employee:1
+ZADD salary_index 55000 employee:2
+ZADD salary_index 48000 employee:3
+ZADD salary_index 70000 employee:4
+ZADD salary_index 52000 employee:5
 
 SMEMBERS dept:HR
 
