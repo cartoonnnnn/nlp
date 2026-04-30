@@ -3,7 +3,11 @@ sudo apt install redis-server -y
 sudo service redis-server start
 redis-cli
 
-SET product:1 '{"Name":"Laptop","Category":"Electronics","Price":900}' SET product:2 '{"Name":"Phone","Category":"Electronics","Price":700}' SET product:3 '{"Name":"Shoes","Category":"Fashion","Price":800}' SET product:4 '{"Name":"Watch","Category":"Accessories","Price":600}' SET product:5 '{"Name":"Headphones","Category":"Electronics","Price":500}'
+SET product:1 '{"Name":"Laptop","Category":"Electronics","Price":900}'
+SET product:2 '{"Name":"Phone","Category":"Electronics","Price":700}'
+SET product:3 '{"Name":"Shoes","Category":"Fashion","Price":800}'
+SET product:4 '{"Name":"Watch","Category":"Accessories","Price":600}'
+SET product:5 '{"Name":"Headphones","Category":"Electronics","Price":500}'
 
 SADD category:Electronics product:1 product:2 product:5 SADD category:Fashion product:3 SADD category:Accessories product:4
 
